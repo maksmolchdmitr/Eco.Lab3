@@ -22,6 +22,11 @@
 
 #include "IEcoLab1.h"
 #include "IEcoSystem1.h"
+#include "IEcoLab1Events.h"
+#include "IEcoConnectionPointContainer.h"
+
+#include "CEcoLab1ConnectionPoint.h"
+
 #include "IdEcoMemoryManager1.h"
 
 typedef struct CEcoLab1 {
@@ -29,6 +34,11 @@ typedef struct CEcoLab1 {
     /* Таблица функций интерфейса IEcoLab1 */
     IEcoLab1VTbl* m_pVTblIEcoLab1;
 
+    /* Таблица функций интерфейса IEcoConnectionPointContainer */
+    IEcoConnectionPointContainerVTbl* m_pVTblIEcoConnectionPointContainter;
+
+    /* Точка подключения */
+    CEcoLab1ConnectionPoint* m_pISinkCP;
 
     /* Счетчик ссылок */
     uint32_t m_cRef;
