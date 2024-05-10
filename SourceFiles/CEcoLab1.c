@@ -20,7 +20,11 @@
 #include "IEcoSystem1.h"
 #include "IEcoInterfaceBus1.h"
 #include "IEcoInterfaceBus1MemExt.h"
+#include "IEcoConnectionPointContainer.h"
+#include "IEcoEnumConnections.h"
+
 #include "CEcoLab1.h"
+#include "CEcoLab1EnumConnectionPoints.h"
 
 /*
  *
@@ -47,6 +51,9 @@ CEcoLab1_QueryInterface(/* in */ struct IEcoLab1 *me, /* in */ const UGUID *riid
     if (IsEqualUGUID(riid, &IID_IEcoLab1)) {
         *ppv = &pCMe->m_pVTblIEcoLab1;
         pCMe->m_pVTblIEcoLab1->AddRef((IEcoLab1 *) pCMe);
+    } else if ( IsEqualUGUID(riid, &IID_IEcoConnectionPointContainer) ) {
+        *ppv = &pCMe->m_pVTblIEcoConnectionPointContainter;
+        pCMe->m_pVTblIEcoLab1->AddRef((IEcoLab1*)pCMe);
     } else if (IsEqualUGUID(riid, &IID_IEcoUnknown)) {
         *ppv = &pCMe->m_pVTblIEcoLab1;
         pCMe->m_pVTblIEcoLab1->AddRef((IEcoLab1 *) pCMe);
