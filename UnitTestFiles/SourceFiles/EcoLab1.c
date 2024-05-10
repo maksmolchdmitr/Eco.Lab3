@@ -84,10 +84,19 @@ int16_t EcoMain(IEcoUnknown *pIUnk) {
     /* Указатель на интерфейс работы с системной интерфейсной шиной */
     IEcoInterfaceBus1 *pIBus = 0;
     /* Указатель на интерфейс работы с памятью */
-    IEcoMemoryAllocator1 *pIMem = 0;
+    IEcoMemoryAllocator1 * pIMem = 0;
     int size = 0;
     /* Указатель на тестируемый интерфейс */
-    IEcoLab1 *pIEcoLab1 = 0;
+    IEcoLab1 * pIEcoLab1 = 0;
+    /* Указатель на интерфейс контейнера точек подключения */
+    IEcoConnectionPointContainer * pICPC = 0;
+    /* Указатель на интерфейс точки подключения */
+    IEcoConnectionPoint * pICP = 0;
+    /* Указатель на обратный интерфейс */
+    IEcoLab1Events * pIEcoLab1Sink = 0;
+    IEcoUnknown *pISinkUnk = 0;
+    uint32_t cAdvise = 0;
+    int arr[] = {54,2,55,6,5,5,1,12};
 
     /* Проверка и создание системного интрефейса */
     if (pISys == 0) {
@@ -111,6 +120,13 @@ int16_t EcoMain(IEcoUnknown *pIUnk) {
         /* Освобождение в случае ошибки */
         goto Release;
     }
+
+    /* Регистрация статического компонента для работы со списком */
+    result = pIBus->pVTbl->RegisterComponent(pIBus, &CID_EcoList1, (IEcoUnknown*)GetIEcoComponentFactoryPtr_53884AFC93C448ECAA929C8D3A562281);
+    if (result != 0 ) {
+        /* Освобождение в случае ошибки */
+        goto Release;
+    }
 #endif
     /* Получение интерфейса управления памятью */
     result = pIBus->pVTbl->QueryComponent(pIBus, &CID_EcoMemoryManager1, 0, &IID_IEcoMemoryAllocator1,
@@ -129,6 +145,55 @@ int16_t EcoMain(IEcoUnknown *pIUnk) {
         /* Освобождение интерфейсов в случае ошибки */
         goto Release;
     }
+
+    result = pIBus->pVTbl->QueryComponent(pIBus, &CID_EcoLab1, 0, &IID_IEcoLab1, (void **) &pIEcoLab1);
+    if (result != 0 || pIEcoLab1 == 0) {
+        /* Освобождение интерфейсов в случае ошибки */
+        goto Release;
+    }
+
+    /* Проверка поддержки подключений обратного интерфейса */
+    result = pIEcoLab1->pVTbl->QueryInterface(pIEcoLab1, &IID_IEcoConnectionPointContainer, (void **) &pICPC);
+    if (result != 0 || pICPC == 0) {
+        /* Освобождение интерфейсов в случае ошибки */
+        goto Release;
+    }
+
+    /* Запрос на получения интерфейса точки подключения */
+    result = pICPC->pVTbl->FindConnectionPoint(pICPC, &IID_IEcoLab1Events, &pICP);
+    if (result != 0 || pICP == 0) {
+        /* Освобождение интерфейсов в случае ошибки */
+        goto Release;
+    }
+    /* Освобождение интерфейса */
+    pICPC->pVTbl->Release(pICPC);
+
+    /* Создание экземпляра обратного интерфейса */
+    result = createCEcoLab1Sink(pIMem, (IEcoLab1Events * *) & pIEcoLab1Sink);
+    if (result != 0 || pICP == 0) {
+        /* Освобождение интерфейсов в случае ошибки */
+        goto Release;
+    }
+
+    if (pIEcoLab1Sink != 0) {
+        result = pIEcoLab1Sink->pVTbl->QueryInterface(pIEcoLab1Sink, &IID_IEcoUnknown, (void **) &pISinkUnk);
+        if (result != 0 || pISinkUnk == 0) {
+            /* Освобождение интерфейсов в случае ошибки */
+            goto Release;
+        }
+        /* Подключение */
+        result = pICP->pVTbl->Advise(pICP, pISinkUnk, &cAdvise);
+        /* Проверка */
+        if (result == 0 && cAdvise == 1) {
+            /* Сюда можно добавить код */
+        }
+        /* Освобождение интерфейса */
+        pISinkUnk->pVTbl->Release(pISinkUnk);
+    }
+
+    printf("Example: \n\n");
+    result = pIEcoLab1->pVTbl->ShellSortShellStep(pIEcoLab1, arr, 8, sizeof(int), int_cmp);
+    goto Release;
 
     setlocale(LC_ALL, "Russian");
 
@@ -408,7 +473,7 @@ void unitTestShellSortHibbardStepStringArray(int arraySize, IEcoLab1 *pIEcoLab1)
     srand(time(0));
     // Заполнение массивa рандомной информацией
     stringArr = (char **) malloc(arraySize * sizeof(char *));
-    randomFillStringArray(stringArr, arraySize, arraySize*2);
+    randomFillStringArray(stringArr, arraySize, arraySize * 2);
 
     // Начало замера времени
     start = clock();
@@ -434,8 +499,8 @@ void unitTestShellSortShellStepStringArray(int arraySize, IEcoLab1 *pIEcoLab1) {
     srand(time(0));
     // Заполнение массивa рандомной информацией
     stringArr = (char **) malloc(arraySize * sizeof(char *));
-    randomFillStringArray(stringArr, arraySize, arraySize*2);
-    
+    randomFillStringArray(stringArr, arraySize, arraySize * 2);
+
     // Начало замера времени
     start = clock();
     pIEcoLab1->pVTbl->ShellSortShellStep(pIEcoLab1, stringArr, arraySize, sizeof(char *), string_cmp);
@@ -461,7 +526,7 @@ void unitTestShellSortKnuthStepStringArray(int arraySize, IEcoLab1 *pIEcoLab1) {
     srand(time(0));
     // Заполнение массивa рандомной информацией
     stringArr = (char **) malloc(arraySize * sizeof(char *));
-    randomFillStringArray(stringArr, arraySize, arraySize*2);
+    randomFillStringArray(stringArr, arraySize, arraySize * 2);
 
     // Начало замера времени
     start = clock();
@@ -487,7 +552,7 @@ void unitTestQSortStringArray(int arraySize) {
     srand(time(0));
     // Заполнение массивa рандомной информацией
     stringArr = (char **) malloc(arraySize * sizeof(char *));
-    randomFillStringArray(stringArr, arraySize, arraySize*2);
+    randomFillStringArray(stringArr, arraySize, arraySize * 2);
 
     // Начало замера времени
     start = clock();
