@@ -32,6 +32,7 @@ INCLUDES = \
 -I ../../../HeaderFiles \
 -I ../../../SharedFiles \
 -I ../../../UnitTestFiles/HeaderFiles \
+-I $(ECO_FRAMEWORK)/Eco.List1/SharedFiles \
 -I $(ECO_FRAMEWORK)/Eco.Core1/SharedFiles \
 -I $(ECO_FRAMEWORK)/Eco.InterfaceBus1/SharedFiles \
 -I $(ECO_FRAMEWORK)/Eco.FileSystemManagement1/SharedFiles \
@@ -40,6 +41,7 @@ INCLUDES = \
 # libraries directories
 LIB_DIR = \
 -L ../../../BuildFiles/Linux/x64/$(CONFIG_TARGET) \
+-L $(ECO_FRAMEWORK)/Eco.List1/BuildFiles/Linux/x64/StaticRelease -l53884AFC93C448ECAA929C8D3A562281 \
 -L $(ECO_FRAMEWORK)/Eco.InterfaceBus1/BuildFiles/Linux/x64/StaticRelease \
 -L $(ECO_FRAMEWORK)/Eco.FileSystemManagement1/BuildFiles/Linux/x64/StaticRelease \
 -L $(ECO_FRAMEWORK)/Eco.MemoryManager1/BuildFiles/Linux/x64/StaticRelease \
