@@ -26,6 +26,8 @@
 #include "CEcoLab1.h"
 #include "CEcoLab1EnumConnectionPoints.h"
 
+#include <stdbool.h>
+
 /*
  *
  * <сводка>
@@ -146,7 +148,7 @@ int16_t CEcoLab1_ShellSortShellStep(/* in */ struct IEcoLab1 *me, /* in */ void 
     for (step = number / 2; step > 0; step /= 2) {
         for (i = step; i < number; ++i) {
             for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
-                swap(charBase + j * width, charBase + (j + step) * width, width);
+                swap(me, charBase + j * width, charBase + (j + step) * width, width);
             }
         }
     }
@@ -178,7 +180,7 @@ int16_t CEcoLab1_ShellSortHibbardStep(/* in */ struct IEcoLab1 *me, /* in */ voi
     for (; step > 0; step = (step + 1) / 2 - 1) {
         for (i = step; i < number; ++i) {
             for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
-                swap(charBase + j * width, charBase + (j + step) * width, width);
+                swap(me, charBase + j * width, charBase + (j + step) * width, width);
             }
         }
     }
@@ -210,7 +212,7 @@ int16_t CEcoLab1_ShellSortKnuthStep(/* in */ struct IEcoLab1 *me, /* in */ void 
     for (; step > 0; step = (((step * 2 + 1) / 3) - 1) / 2) {
         for (i = step; i < number; ++i) {
             for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
-                swap(charBase + j * width, charBase + (j + step) * width, width);
+                swap(me, charBase + j * width, charBase + (j + step) * width, width);
             }
         }
     }
@@ -218,11 +220,45 @@ int16_t CEcoLab1_ShellSortKnuthStep(/* in */ struct IEcoLab1 *me, /* in */ void 
     return 0;
 }
 
-void swap(void *a, void *b, size_t size) {
+int16_t CEcoLab1_Fire_OnSwap(/* in */ struct IEcoLab1Events *me, void *a, void *b, size_t size) {
+    CEcoLab1 *pCMe = (CEcoLab1 *) me;
+    int16_t result = 0;
+    uint32_t count = 0;
+    uint32_t index = 0;
+    IEcoEnumConnections * pEnum = 0;
+    IEcoLab1Events * pIEvents = 0;
+    EcoConnectionData cd;
+
+    if (me == 0) {
+        return -1;
+    }
+
+    if (pCMe->m_pISinkCP != 0) {
+        result = ((IEcoConnectionPoint * )
+        pCMe->m_pISinkCP)->pVTbl->EnumConnections((IEcoConnectionPoint * )
+        pCMe->m_pISinkCP, &pEnum);
+        if ((result == 0) && (pEnum != 0)) {
+            while (pEnum->pVTbl->Next(pEnum, 1, &cd, 0) == 0) {
+                result = cd.pUnk->pVTbl->QueryInterface(cd.pUnk, &IID_IEcoLab1Events, (void **) &pIEvents);
+                if ((result == 0) && (pIEvents != 0)) {
+                    result = pIEvents->pVTbl->OnSwap(pIEvents, a, b, size);
+                    pIEvents->pVTbl->Release(pIEvents);
+                }
+                cd.pUnk->pVTbl->Release(cd.pUnk);
+            }
+            pEnum->pVTbl->Release(pEnum);
+        }
+    }
+    return result;
+}
+
+void swap(/* in */ struct IEcoLab1 *me, void *a, void *b, size_t size) {
     size_t i = 0;
     char buffer[size]; // Временный буфер для обмена значений
     char *pa = (char *) a;
     char *pb = (char *) b;
+
+    CEcoLab1_Fire_OnSwap(me, a, b, size);
 
     for (i = 0; i < size; i++) {
         buffer[i] = pa[i];

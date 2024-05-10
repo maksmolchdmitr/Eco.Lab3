@@ -96,7 +96,8 @@ int16_t EcoMain(IEcoUnknown *pIUnk) {
     IEcoLab1Events * pIEcoLab1Sink = 0;
     IEcoUnknown *pISinkUnk = 0;
     uint32_t cAdvise = 0;
-    int arr[] = {54,2,55,6,5,5,1,12};
+    int arr[] = {8, 7, 6, 5, 4, 3, 2, 1};
+
 
     /* Проверка и создание системного интрефейса */
     if (pISys == 0) {
@@ -192,6 +193,7 @@ int16_t EcoMain(IEcoUnknown *pIUnk) {
     }
 
     printf("Example: \n\n");
+    printIntArray(arr, 8);
     result = pIEcoLab1->pVTbl->ShellSortShellStep(pIEcoLab1, arr, 8, sizeof(int), int_cmp);
     goto Release;
 

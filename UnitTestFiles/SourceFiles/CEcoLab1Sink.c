@@ -110,13 +110,14 @@ uint32_t ECOCALLMETHOD CEcoLab1Sink_Release(/* in */ struct IEcoLab1Events* me) 
  * </описание>
  *
  */
-int16_t ECOCALLMETHOD CEcoLab1Sink_OnMyCallback(/* in */ struct IEcoLab1Events* me, /* in */ char_t* Name) {
+int16_t ECOCALLMETHOD CEcoLab1Sink_OnSwap(/* in */ struct IEcoLab1Events* me, void *a, void *b, size_t size) {
     CEcoLab1Sink* pCMe = (CEcoLab1Sink*)me;
 
     if (me == 0 ) {
         return -1;
     }
 
+    printf("Swap for %d _ %d\n", *((int*)a), *((int*)b));
 
     return 0;
 }
@@ -192,7 +193,7 @@ IEcoLab1VTblEvents g_x2D2E3B9214F248A6A09ECB494B59C795VTblEvents = {
     CEcoLab1Sink_QueryInterface,
     CEcoLab1Sink_AddRef,
     CEcoLab1Sink_Release,
-    CEcoLab1Sink_OnMyCallback
+    CEcoLab1Sink_OnSwap
 };
 
 /*
