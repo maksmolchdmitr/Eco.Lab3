@@ -24,7 +24,8 @@ endif
 
 # source files.
 SRC = \
-../../../UnitTestFiles/SourceFiles/EcoLab1.c
+../../../UnitTestFiles/SourceFiles/EcoLab1.c \
+../../../UnitTestFiles/SourceFiles/CEcoLab1Sink.c
 
 
 # include directories
