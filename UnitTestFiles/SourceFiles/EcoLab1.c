@@ -20,10 +20,17 @@
 
 /* Eco OS */
 #include "IEcoSystem1.h"
+#include "IEcoConnectionPointContainer.h"
+#include "IEcoLab1Events.h"
+
+#include "CEcoLab1Sink.h"
+
 #include "IdEcoMemoryManager1.h"
+#include "IdEcoLab1.h"
 #include "IdEcoInterfaceBus1.h"
 #include "IdEcoFileSystemManagement1.h"
-#include "IdEcoLab1.h"
+#include "IdEcoList1.h"
+
 #include <stdio.h>
 #include <time.h>
 
