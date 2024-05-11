@@ -45,6 +45,26 @@ void int_print(const void *a){
     printf("%d", *pa);
 }
 
+void print_int_array(void *base, size_t size) {
+    int* arr = (int *) base;
+    int i = 0;
+    printf("Array: [ ");
+    for (i = 0; i < size; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("]\n");
+}
+
+void print_string_array(void *base, size_t size) {
+    char **arr = (char **) base;
+    int i = 0;
+    printf("Array: [ ");
+    for (i = 0; i < size; i++) {
+        printf("'%s' ", arr[i]);
+    }
+    printf("]\n");
+}
+
 int char_cmp(const void *a, const void *b) {
     const char *pa = (const char *) a;
     const char *pb = (const char *) b;
@@ -205,10 +225,10 @@ int16_t EcoMain(IEcoUnknown *pIUnk) {
 
     printf("Example with int array logging:\n");
     printIntArray(int_arr, 8);
-    result = pIEcoLab1->pVTbl->ShellSortShellStep_WithLog(pIEcoLab1, int_arr, 8, sizeof(int), int_cmp, int_print);
+    result = pIEcoLab1->pVTbl->ShellSortShellStep_WithLog(pIEcoLab1, int_arr, 8, sizeof(int), int_cmp, int_print, print_int_array);
     printf("Example with string array logging:\n");
     printStringArray(string_arr, 4);
-    result = pIEcoLab1->pVTbl->ShellSortShellStep_WithLog(pIEcoLab1, string_arr, 4, sizeof(char*), string_cmp, string_print);
+    result = pIEcoLab1->pVTbl->ShellSortShellStep_WithLog(pIEcoLab1, string_arr, 4, sizeof(char*), string_cmp, string_print, print_string_array);
     goto Release;
 
     setlocale(LC_ALL, "Russian");

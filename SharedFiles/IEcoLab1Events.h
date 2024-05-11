@@ -41,6 +41,7 @@ typedef struct IEcoLab1VTblEvents {
 
     /* IEcoLab1Events */
     int16_t (ECOCALLMETHOD *OnSwap)(/* in */ struct IEcoLab1Events* me, void *a, void *b, void (*print)(const void *));
+    int16_t (ECOCALLMETHOD *OnChangeArray)(/* in */ struct IEcoLab1Events* me, void *base, size_t number, void (*print_array)(void *, size_t));
 
 } IEcoLab1VTblEvents, *IEcoLab1VTblEventsPtr;
 

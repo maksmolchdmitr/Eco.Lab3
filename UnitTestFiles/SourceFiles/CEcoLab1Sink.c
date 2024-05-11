@@ -126,6 +126,19 @@ int16_t ECOCALLMETHOD CEcoLab1Sink_OnSwap(/* in */ struct IEcoLab1Events* me, vo
     return 0;
 }
 
+int16_t ECOCALLMETHOD CEcoLab1Sink_OnChangeArray(/* in */ struct IEcoLab1Events* me, void *base, size_t number, void (*print_array)(void *, size_t)) {
+    CEcoLab1Sink* pCMe = (CEcoLab1Sink*)me;
+
+    if (me == 0 ) {
+        return -1;
+    }
+
+    printf("Array was been changed! Current array state: ");
+    print_array(base, number);
+
+    return 0;
+}
+
 
 /*
  *
@@ -197,7 +210,8 @@ IEcoLab1VTblEvents g_x2D2E3B9214F248A6A09ECB494B59C795VTblEvents = {
     CEcoLab1Sink_QueryInterface,
     CEcoLab1Sink_AddRef,
     CEcoLab1Sink_Release,
-    CEcoLab1Sink_OnSwap
+    CEcoLab1Sink_OnSwap,
+    CEcoLab1Sink_OnChangeArray
 };
 
 /*

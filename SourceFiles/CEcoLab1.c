@@ -222,7 +222,8 @@ int16_t CEcoLab1_ShellSortKnuthStep(/* in */ struct IEcoLab1 *me, /* in */ void 
 
 
 int16_t ShellSortShellStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void *base, size_t number, size_t width,
-                                            int (*cmp)(const void *, const void *), void (*print)(const void *)) {
+                                            int (*cmp)(const void *, const void *), void (*print)(const void *),
+                                            void (*print_array)(void *, size_t)) {
     CEcoLab1 *pCMe = (CEcoLab1 *) me;
     int16_t index = 0;
     int step = 0;
@@ -239,6 +240,7 @@ int16_t ShellSortShellStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void *
         for (i = step; i < number; ++i) {
             for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
                 swap_with_log(me, charBase + j * width, charBase + (j + step) * width, width, print);
+                change_array_with_log(me, base, number, print_array);
             }
         }
     }
@@ -247,7 +249,8 @@ int16_t ShellSortShellStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void *
 }
 
 int16_t ShellSortHibbardStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void *base, size_t number, size_t width,
-                                              int (*cmp)(const void *, const void *), void (*print)(const void *)) {
+                                              int (*cmp)(const void *, const void *), void (*print)(const void *),
+                                              void (*print_array)(void *, size_t)) {
     CEcoLab1 *pCMe = (CEcoLab1 *) me;
     int16_t index = 0;
     int step = 0;
@@ -271,6 +274,7 @@ int16_t ShellSortHibbardStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void
         for (i = step; i < number; ++i) {
             for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
                 swap_with_log(me, charBase + j * width, charBase + (j + step) * width, width, print);
+                change_array_with_log(me, base, number, print_array);
             }
         }
     }
@@ -279,7 +283,8 @@ int16_t ShellSortHibbardStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void
 }
 
 int16_t ShellSortKnuthStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void *base, size_t number, size_t width,
-                                            int (*cmp)(const void *, const void *), void (*print)(const void *)) {
+                                            int (*cmp)(const void *, const void *), void (*print)(const void *),
+                                            void (*print_array)(void *, size_t)) {
     CEcoLab1 *pCMe = (CEcoLab1 *) me;
     int16_t index = 0;
     int step = 0;
@@ -303,6 +308,7 @@ int16_t ShellSortKnuthStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void *
         for (i = step; i < number; ++i) {
             for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
                 swap_with_log(me, charBase + j * width, charBase + (j + step) * width, width, print);
+                change_array_with_log(me, base, number, print_array);
             }
         }
     }
@@ -340,6 +346,44 @@ int16_t CEcoLab1_PushEvent_OnSwap(/* in */ struct IEcoLab1Events *me, void *a, v
         }
     }
     return result;
+}
+
+int16_t CEcoLab1_PushEvent_OnChangeArray(/* in */ struct IEcoLab1 *me, void *base, size_t number,
+                                                  void (*print_array)(void *, size_t)) {
+    CEcoLab1 *pCMe = (CEcoLab1 *) me;
+    int16_t result = 0;
+    uint32_t count = 0;
+    uint32_t index = 0;
+    IEcoEnumConnections * pEnum = 0;
+    IEcoLab1Events * pIEvents = 0;
+    EcoConnectionData cd;
+
+    if (me == 0) {
+        return -1;
+    }
+
+    if (pCMe->m_pISinkCP != 0) {
+        result = ((IEcoConnectionPoint * )
+        pCMe->m_pISinkCP)->pVTbl->EnumConnections((IEcoConnectionPoint * )
+        pCMe->m_pISinkCP, &pEnum);
+        if ((result == 0) && (pEnum != 0)) {
+            while (pEnum->pVTbl->Next(pEnum, 1, &cd, 0) == 0) {
+                result = cd.pUnk->pVTbl->QueryInterface(cd.pUnk, &IID_IEcoLab1Events, (void **) &pIEvents);
+                if ((result == 0) && (pIEvents != 0)) {
+                    result = pIEvents->pVTbl->OnChangeArray(pIEvents, base, number, print_array);
+                    pIEvents->pVTbl->Release(pIEvents);
+                }
+                cd.pUnk->pVTbl->Release(cd.pUnk);
+            }
+            pEnum->pVTbl->Release(pEnum);
+        }
+    }
+    return result;
+}
+
+void change_array_with_log(/* in */ struct IEcoLab1 *me, void *base, size_t number,
+                                    void (*print_array)(void *, size_t)) {
+    CEcoLab1_PushEvent_OnChangeArray(me, base, number, print_array);
 }
 
 void swap_with_log(/* in */ struct IEcoLab1 *me, void *a, void *b, size_t size, void (*print)(const void *)) {
