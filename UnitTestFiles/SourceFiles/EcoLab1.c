@@ -127,7 +127,11 @@ int16_t EcoMain(IEcoUnknown *pIUnk) {
     IEcoUnknown *pISinkUnk = 0;
     uint32_t cAdvise = 0;
     int int_arr[] = {8, 7, 6, 5, 4, 3, 2, 1};
+    int int_arr_2[] = {8, 7, 6, 5, 4, 3, 2, 1};
+    int int_arr_3[] = {8, 7, 6, 5, 4, 3, 2, 1};
     char* string_arr[] = {"Algo", "Operation", "C", "C++"};
+    char* string_arr_2[] = {"Algo", "Operation", "C", "C++"};
+    char* string_arr_3[] = {"Algo", "Operation", "C", "C++"};
 
 
     /* Проверка и создание системного интрефейса */
@@ -223,12 +227,32 @@ int16_t EcoMain(IEcoUnknown *pIUnk) {
         pISinkUnk->pVTbl->Release(pISinkUnk);
     }
 
+    printf("ShellSort logging with various stepping:\n");
+
+    printf("\n1) ShellStep:\n");
     printf("Example with int array logging:\n");
     printIntArray(int_arr, 8);
     result = pIEcoLab1->pVTbl->ShellSortShellStep_WithLog(pIEcoLab1, int_arr, 8, sizeof(int), int_cmp, int_print, print_int_array);
     printf("Example with string array logging:\n");
     printStringArray(string_arr, 4);
     result = pIEcoLab1->pVTbl->ShellSortShellStep_WithLog(pIEcoLab1, string_arr, 4, sizeof(char*), string_cmp, string_print, print_string_array);
+
+    printf("\n2) HibbardStep:\n");
+    printf("Example with int array logging:\n");
+    printIntArray(int_arr, 8);
+    result = pIEcoLab1->pVTbl->ShellSortHibbardStep_WithLog(pIEcoLab1, int_arr_2, 8, sizeof(int), int_cmp, int_print, print_int_array);
+    printf("Example with string array logging:\n");
+    printStringArray(string_arr, 4);
+    result = pIEcoLab1->pVTbl->ShellSortHibbardStep_WithLog(pIEcoLab1, string_arr_2, 4, sizeof(char*), string_cmp, string_print, print_string_array);
+
+    printf("\n3) KnuthStep:\n");
+    printf("Example with int array logging:\n");
+    printIntArray(int_arr, 8);
+    result = pIEcoLab1->pVTbl->ShellSortKnuthStep_WithLog(pIEcoLab1, int_arr_3, 8, sizeof(int), int_cmp, int_print, print_int_array);
+    printf("Example with string array logging:\n");
+    printStringArray(string_arr, 4);
+    result = pIEcoLab1->pVTbl->ShellSortKnuthStep_WithLog(pIEcoLab1, string_arr_3, 4, sizeof(char*), string_cmp, string_print, print_string_array);
+
     goto Release;
 
     setlocale(LC_ALL, "Russian");
