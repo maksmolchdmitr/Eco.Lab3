@@ -40,6 +40,11 @@ int int_cmp(const void *a, const void *b) {
     return *pa - *pb;
 }
 
+void int_print(const void *a){
+    const int *pa = (const int *) a;
+    printf("%d", *pa);
+}
+
 int char_cmp(const void *a, const void *b) {
     const char *pa = (const char *) a;
     const char *pb = (const char *) b;
@@ -192,9 +197,9 @@ int16_t EcoMain(IEcoUnknown *pIUnk) {
         pISinkUnk->pVTbl->Release(pISinkUnk);
     }
 
-    printf("Example: \n\n");
+    printf("Example:\n");
     printIntArray(arr, 8);
-    result = pIEcoLab1->pVTbl->ShellSortShellStep(pIEcoLab1, arr, 8, sizeof(int), int_cmp);
+    result = pIEcoLab1->pVTbl->ShellSortShellStep_WithLog(pIEcoLab1, arr, 8, sizeof(int), int_cmp, int_print);
     goto Release;
 
     setlocale(LC_ALL, "Russian");

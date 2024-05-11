@@ -148,7 +148,7 @@ int16_t CEcoLab1_ShellSortShellStep(/* in */ struct IEcoLab1 *me, /* in */ void 
     for (step = number / 2; step > 0; step /= 2) {
         for (i = step; i < number; ++i) {
             for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
-                swap(me, charBase + j * width, charBase + (j + step) * width, width);
+                swap(charBase + j * width, charBase + (j + step) * width, width);
             }
         }
     }
@@ -180,7 +180,7 @@ int16_t CEcoLab1_ShellSortHibbardStep(/* in */ struct IEcoLab1 *me, /* in */ voi
     for (; step > 0; step = (step + 1) / 2 - 1) {
         for (i = step; i < number; ++i) {
             for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
-                swap(me, charBase + j * width, charBase + (j + step) * width, width);
+                swap(charBase + j * width, charBase + (j + step) * width, width);
             }
         }
     }
@@ -212,7 +212,7 @@ int16_t CEcoLab1_ShellSortKnuthStep(/* in */ struct IEcoLab1 *me, /* in */ void 
     for (; step > 0; step = (((step * 2 + 1) / 3) - 1) / 2) {
         for (i = step; i < number; ++i) {
             for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
-                swap(me, charBase + j * width, charBase + (j + step) * width, width);
+                swap(charBase + j * width, charBase + (j + step) * width, width);
             }
         }
     }
@@ -220,7 +220,97 @@ int16_t CEcoLab1_ShellSortKnuthStep(/* in */ struct IEcoLab1 *me, /* in */ void 
     return 0;
 }
 
-int16_t CEcoLab1_Fire_OnSwap(/* in */ struct IEcoLab1Events *me, void *a, void *b, size_t size) {
+
+int16_t ShellSortShellStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void *base, size_t number, size_t width,
+                                            int (*cmp)(const void *, const void *), void (*print)(const void *)) {
+    CEcoLab1 *pCMe = (CEcoLab1 *) me;
+    int16_t index = 0;
+    int step = 0;
+    int i = 0;
+    int j = 0;
+    char *charBase = base;
+
+    /* Проверка указателей */
+    if (me == 0 || base == 0) {
+        return -1;
+    }
+
+    for (step = number / 2; step > 0; step /= 2) {
+        for (i = step; i < number; ++i) {
+            for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
+                swap_with_log(me, charBase + j * width, charBase + (j + step) * width, width, print);
+            }
+        }
+    }
+
+    return 0;
+}
+
+int16_t ShellSortHibbardStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void *base, size_t number, size_t width,
+                                              int (*cmp)(const void *, const void *), void (*print)(const void *)) {
+    CEcoLab1 *pCMe = (CEcoLab1 *) me;
+    int16_t index = 0;
+    int step = 0;
+    int var = 0;
+    int i = 0;
+    int j = 0;
+    char *charBase = base;
+
+    /* Проверка указателей */
+    if (me == 0 || base == 0) {
+        return -1;
+    }
+
+    var = 1;
+    while (var * 2 - 1 < number) {
+        var *= 2;
+    }
+    step = var - 1;
+
+    for (; step > 0; step = (step + 1) / 2 - 1) {
+        for (i = step; i < number; ++i) {
+            for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
+                swap_with_log(me, charBase + j * width, charBase + (j + step) * width, width, print);
+            }
+        }
+    }
+
+    return 0;
+}
+
+int16_t ShellSortKnuthStep_WithLog(/* in */ struct IEcoLab1 *me, /* in */ void *base, size_t number, size_t width,
+                                            int (*cmp)(const void *, const void *), void (*print)(const void *)) {
+    CEcoLab1 *pCMe = (CEcoLab1 *) me;
+    int16_t index = 0;
+    int step = 0;
+    int var = 0;
+    int i = 0;
+    int j = 0;
+    char *charBase = base;
+
+    /* Проверка указателей */
+    if (me == 0 || base == 0) {
+        return -1;
+    }
+
+    var = 1;
+    while ((var * 3 - 1) / 2 < (number / 3)) {
+        var *= 3;
+    }
+    step = (var - 1) / 2;
+
+    for (; step > 0; step = (((step * 2 + 1) / 3) - 1) / 2) {
+        for (i = step; i < number; ++i) {
+            for (j = i - step; j >= 0 && cmp(charBase + j * width, charBase + (j + step) * width) > 0; j -= step) {
+                swap_with_log(me, charBase + j * width, charBase + (j + step) * width, width, print);
+            }
+        }
+    }
+
+    return 0;
+}
+
+int16_t CEcoLab1_PushEvent_OnSwap(/* in */ struct IEcoLab1Events *me, void *a, void *b, void (*print)(const void *)) {
     CEcoLab1 *pCMe = (CEcoLab1 *) me;
     int16_t result = 0;
     uint32_t count = 0;
@@ -241,7 +331,7 @@ int16_t CEcoLab1_Fire_OnSwap(/* in */ struct IEcoLab1Events *me, void *a, void *
             while (pEnum->pVTbl->Next(pEnum, 1, &cd, 0) == 0) {
                 result = cd.pUnk->pVTbl->QueryInterface(cd.pUnk, &IID_IEcoLab1Events, (void **) &pIEvents);
                 if ((result == 0) && (pIEvents != 0)) {
-                    result = pIEvents->pVTbl->OnSwap(pIEvents, a, b, size);
+                    result = pIEvents->pVTbl->OnSwap(pIEvents, a, b, print);
                     pIEvents->pVTbl->Release(pIEvents);
                 }
                 cd.pUnk->pVTbl->Release(cd.pUnk);
@@ -252,13 +342,26 @@ int16_t CEcoLab1_Fire_OnSwap(/* in */ struct IEcoLab1Events *me, void *a, void *
     return result;
 }
 
-void swap(/* in */ struct IEcoLab1 *me, void *a, void *b, size_t size) {
+void swap_with_log(/* in */ struct IEcoLab1 *me, void *a, void *b, size_t size, void (*print)(const void *)) {
     size_t i = 0;
     char buffer[size]; // Временный буфер для обмена значений
     char *pa = (char *) a;
     char *pb = (char *) b;
 
-    CEcoLab1_Fire_OnSwap(me, a, b, size);
+    CEcoLab1_PushEvent_OnSwap(me, a, b, print);
+
+    for (i = 0; i < size; i++) {
+        buffer[i] = pa[i];
+        pa[i] = pb[i];
+        pb[i] = buffer[i];
+    }
+}
+
+void swap(void *a, void *b, size_t size) {
+    size_t i = 0;
+    char buffer[size]; // Временный буфер для обмена значений
+    char *pa = (char *) a;
+    char *pb = (char *) b;
 
     for (i = 0; i < size; i++) {
         buffer[i] = pa[i];
@@ -323,7 +426,10 @@ IEcoLab1VTbl g_x277FC00C35624096AFCFC125B94EEC90VTbl = {
         CEcoLab1_Release,
         CEcoLab1_ShellSortShellStep,
         CEcoLab1_ShellSortHibbardStep,
-        CEcoLab1_ShellSortKnuthStep
+        CEcoLab1_ShellSortKnuthStep,
+        ShellSortShellStep_WithLog,
+        ShellSortHibbardStep_WithLog,
+        ShellSortKnuthStep_WithLog
 };
 
 int16_t CEcoLab1_IEcoConnectionPointContainer_QueryInterface(/* in */ struct IEcoConnectionPointContainer *me, /* in */
